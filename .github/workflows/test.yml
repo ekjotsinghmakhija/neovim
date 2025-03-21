@@ -37,7 +37,7 @@ jobs:
       CACHE_UNCRUSTIFY: ${{ github.workspace }}/.cache/uncrustify
       UNCRUSTIFY_VERSION: uncrustify-0.75.0
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: ./.github/scripts/install_deps.sh lua-check
@@ -51,7 +51,7 @@ jobs:
 
       - name: Clone uncrustify
         if: steps.cache-uncrustify.outputs.cache-hit != 'true'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: uncrustify/uncrustify
           ref: ${{ env.UNCRUSTIFY_VERSION }}
@@ -157,7 +157,7 @@ jobs:
     env:
       CC: ${{ matrix.cc }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up environment
         run: |
@@ -263,7 +263,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: ./.github/scripts/install_deps.sh
@@ -292,7 +292,7 @@ jobs:
     timeout-minutes: 45
     name: windows
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: ./.github/actions/cache
 
@@ -366,7 +366,7 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
