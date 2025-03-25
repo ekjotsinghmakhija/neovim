@@ -2668,7 +2668,7 @@ int win_line(win_T *wp, linenr_T lnum, int startrow, int endrow, bool nochange, 
           if (wp->w_p_cuc && VCOL_HLC == (long)wp->w_virtcol) {
             col_attr = cuc_attr;
           } else if (draw_color_col && VCOL_HLC == *color_cols) {
-            col_attr = mc_attr;
+            col_attr = hl_combine_attr(wlv.line_attr_lowprio, mc_attr);
           }
 
           col_attr = hl_combine_attr(col_attr, wlv.line_attr);
@@ -2967,16 +2967,17 @@ int win_line(win_T *wp, linenr_T lnum, int startrow, int endrow, bool nochange, 
         wlv.need_showbreak = true;
       }
       if (statuscol.draw) {
-        if (wlv.row == startrow + wlv.filler_lines + 1
-            || wlv.row == startrow + wlv.filler_lines) {
-          // Re-evaluate 'statuscolumn' for the first wrapped row and non filler line
-          statuscol.textp = NULL;
-        } else if (statuscol.textp) {
+        if (wlv.row == startrow + wlv.filler_lines) {
+          statuscol.textp = NULL;  // re-evaluate for first non-filler line
+        } else if (vim_strchr(p_cpo, CPO_NUMCOL) && wlv.row > startrow + wlv.filler_lines) {
+          statuscol.draw = false;  // don't draw status column if "n" is in 'cpo'
+        } else if (wlv.row == startrow + wlv.filler_lines + 1) {
+          statuscol.textp = NULL;  // re-evaluate for first wrapped line
+        } else {
           // Draw the already built 'statuscolumn' on the next wrapped or filler line
           statuscol.textp = statuscol.text;
           statuscol.hlrecp = statuscol.hlrec;
-        }  // Fall back to default columns if the 'n' flag isn't in 'cpo'
-        statuscol.draw = vim_strchr(p_cpo, CPO_NUMCOL) == NULL;
+        }
       }
       wlv.filler_todo--;
       virt_line_offset = -1;
