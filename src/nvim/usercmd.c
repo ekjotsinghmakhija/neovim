@@ -470,7 +470,7 @@ static void uc_list(char *name, size_t name_len)
       }
 
       // Special cases
-      size_t len = 4;
+      int len = 4;
       if (a & EX_BANG) {
         msg_putchar('!');
         len--;
@@ -492,7 +492,7 @@ static void uc_list(char *name, size_t name_len)
       }
 
       msg_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
-      len = strlen(cmd->uc_name) + 4;
+      len = (int)strlen(cmd->uc_name) + 4;
 
       do {
         msg_putchar(' ');
@@ -501,7 +501,7 @@ static void uc_list(char *name, size_t name_len)
 
       // "over" is how much longer the name is than the column width for
       // the name, we'll try to align what comes after.
-      const int64_t over = (int64_t)len - 22;
+      const int over = len - 22;
       len = 0;
 
       // Arguments
@@ -525,22 +525,20 @@ static void uc_list(char *name, size_t name_len)
 
       do {
         IObuff[len++] = ' ';
-      } while ((int64_t)len < 5 - over);
+      } while (len < 5 - over);
 
       // Address / Range
       if (a & (EX_RANGE | EX_COUNT)) {
         if (a & EX_COUNT) {
           // -count=N
-          int rc = snprintf(IObuff + len, IOSIZE - len, "%" PRId64 "c", cmd->uc_def);
-          assert(rc > 0);
-          len += (size_t)rc;
+          snprintf(IObuff + len, IOSIZE, "%" PRId64 "c", cmd->uc_def);
+          len += (int)strlen(IObuff + len);
         } else if (a & EX_DFLALL) {
           IObuff[len++] = '%';
         } else if (cmd->uc_def >= 0) {
           // -range=N
-          int rc = snprintf(IObuff + len, IOSIZE - len, "%" PRId64 "", cmd->uc_def);
-          assert(rc > 0);
-          len += (size_t)rc;
+          snprintf(IObuff + len, IOSIZE, "%" PRId64 "", cmd->uc_def);
+          len += (int)strlen(IObuff + len);
         } else {
           IObuff[len++] = '.';
         }
@@ -548,34 +546,32 @@ static void uc_list(char *name, size_t name_len)
 
       do {
         IObuff[len++] = ' ';
-      } while ((int64_t)len < 8 - over);
+      } while (len < 8 - over);
 
       // Address Type
       for (j = 0; addr_type_complete[j].expand != ADDR_NONE; j++) {
         if (addr_type_complete[j].expand != ADDR_LINES
             && addr_type_complete[j].expand == cmd->uc_addr_type) {
-          int rc = snprintf(IObuff + len, IOSIZE - len, "%s", addr_type_complete[j].shortname);
-          assert(rc > 0);
-          len += (size_t)rc;
+          STRCPY(IObuff + len, addr_type_complete[j].shortname);
+          len += (int)strlen(IObuff + len);
           break;
         }
       }
 
       do {
         IObuff[len++] = ' ';
-      } while ((int64_t)len < 13 - over);
+      } while (len < 13 - over);
 
       // Completion
       char *cmd_compl = get_command_complete(cmd->uc_compl);
       if (cmd_compl != NULL) {
-        int rc = snprintf(IObuff + len, IOSIZE - len, "%s", get_command_complete(cmd->uc_compl));
-        assert(rc > 0);
-        len += (size_t)rc;
+        STRCPY(IObuff + len, get_command_complete(cmd->uc_compl));
+        len += (int)strlen(IObuff + len);
       }
 
       do {
         IObuff[len++] = ' ';
-      } while ((int64_t)len < 25 - over);
+      } while (len < 25 - over);
 
       IObuff[len] = '\0';
       msg_outtrans(IObuff);

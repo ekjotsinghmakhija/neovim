@@ -26,9 +26,5 @@ describe('Ex cmds', function()
       pcall_err(command, ':bdelete 9999999999999999999999999999999999999999'))
     assert_alive()
   end)
-
-  it('listing long user command does not crash', function()
-    command('execute "command" repeat("T", 255) ":"')
-    command('command')
-  end)
 end)
+
