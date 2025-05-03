@@ -19,4 +19,4 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Create backport PRs
-        uses: korthout/backport-action@v1
+        uses: korthout/backport-action@v3
